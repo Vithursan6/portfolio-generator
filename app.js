@@ -1,15 +1,9 @@
 const inquirer = require('inquirer');
+const generatePage = require('./src/page-template.js');
+const { writeFile, copyFile } = require('./utils/generate-site.js');
 
 const promptUser = () => {
     return inquirer.prompt([
-
-        {
-            type: 'confirm',
-            name: 'confirmAbout',
-            message: 'Would you like to enter some information about yourself for an "About" section?',
-            default: true
-          },
-
         {
             type: 'input',
             name: 'name',
@@ -39,6 +33,13 @@ const promptUser = () => {
         },
 
         {
+            type: 'confirm',
+            name: 'confirmAbout',
+            message: 'Would you like to enter some information about yourself for an "About" section?',
+            default: true
+        },
+
+        {
             type: 'input',
             name: 'about',
             message: 'Provide some information about yourself:',
@@ -56,18 +57,16 @@ const promptUser = () => {
 };
 
 const promptProject = portfolioData => {
-    
-    //If there's no 'projects' array property, create one
-    if (!portfolioData.projects) {
-    portfolioData.projects = [];
-    }
-
     console.log(`
 =================
 Add a New Project
 =================
 `);
 
+ //If there's no 'projects' array property, create one
+ if (!portfolioData.projects) {
+    portfolioData.projects = [];
+    }
     return inquirer.prompt ([
         {
             type: 'input',
@@ -147,12 +146,27 @@ Add a New Project
 promptUser()
     .then(promptProject)
     .then(portfolioData => {
-        console.log(portfolioData);
+        return generatePage(portfolioData);
+
+    })
+    .then(pageHTML => {
+        return writeFile(pageHTML);
+    })
+    .then(writeFileResponse => {
+        console.log(writeFileResponse);
+        return copyFile();
+    })
+    .then(copyFileResponse ={
+        console.log(copyFileResponse);
+    })
+    .catch(err => {
+        console.log(err);
     });
+       
+});
 
     
-// const fs = require('fs');
-// const generatePage = require('./src/page-template.js');
+
 
 // const pageHTML = generatePage(name, github);
 
